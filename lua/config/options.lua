@@ -25,6 +25,8 @@ vim.opt.backup = false
 vim.opt.undofile = true
 vim.opt.linebreak = true
 
+vim.g.autoformat = false
+
 vim.g.mapleader = " "
 
-vim.cmd("filetype plugin indent on")
+vim.g.lazyvim_python_lsp = "pyright"

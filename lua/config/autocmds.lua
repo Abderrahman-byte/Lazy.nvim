@@ -29,21 +29,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   group = yankGrp,
 })
 
--- Center cursor on Insert Enter
--- vim.api.nvim_create_autocmd("InsertEnter", {
---   pattern = "*",
---   command = ":normal zz",
--- })
-
--- vim.api.nvim_create_autocmd("InsertEnter", {
---   pattern = "*",
---   callback = function()
---     vim.cmd("normal! <C-o>zz")
---   end,
--- })
-
--- vim.api.nvim_create_autocmd("BufWritePost", {
---
---   pattern = "*",
---   command = ":normal zz",
--- })
+vim.api.nvim_create_autocmd("InsertEnter", {
+  pattern = "*",
+  callback = function()
+    vim.api.nvim_feedkeys("zz", "xn", true)
+  end,
+})
