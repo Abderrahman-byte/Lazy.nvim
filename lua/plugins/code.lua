@@ -11,7 +11,12 @@ return {
     optional = true,
     opts = {
       formatters_by_ft = {
-        ["python"] = { "isort", "black" },
+        python = { "isort", "black" },
+        lua = { "stylua" },
+        sh = { "shfmt" },
+        go = { "goimports", "gofmt" },
+        templ = { "templ" },
+        html = { "prettier" },
       },
     },
   },
