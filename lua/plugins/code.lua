@@ -4,6 +4,7 @@ return {
     opts = function(_, opts)
       table.insert(opts.ensure_installed, "black")
       table.insert(opts.ensure_installed, "isort")
+      table.insert(opts.ensure_installed, "sql-formatter")
     end,
   },
   {
@@ -17,6 +18,7 @@ return {
         go = { "goimports", "gofmt" },
         templ = { "templ" },
         html = { "prettier" },
+        sql = { "sql_formatter" },
       },
     },
   },

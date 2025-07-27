@@ -54,8 +54,10 @@ return {
                 includeInlayVariableTypeHints = false,
                 includeInlayVariableTypeHintsWhenTypeMatchesName = false,
                 includeInlayPropertyDeclarationTypeHints = false,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
+                -- includeInlayFunctionLikeReturnTypeHints = true,
+                -- includeInlayEnumMemberValueHints = true,
+                includeInlayFunctionLikeReturnTypeHints = false,
+                includeInlayEnumMemberValueHints = false,
               },
             },
             javascript = {
@@ -66,8 +68,10 @@ return {
                 includeInlayFunctionParameterTypeHints = false,
                 includeInlayVariableTypeHintsWhenTypeMatchesName = false,
                 includeInlayPropertyDeclarationTypeHints = false,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
+                -- includeInlayFunctionLikeReturnTypeHints = true,
+                -- includeInlayEnumMemberValueHints = true,
+                includeInlayFunctionLikeReturnTypeHints = false,
+                includeInlayEnumMemberValueHints = false,
               },
             },
           },
@@ -77,14 +81,16 @@ return {
           init_options = {
             vue = {
               -- Set to false for full takeover mode, so Volar provides type checking for both .vue and .ts parts
-              hybridMode = false,
+              hybridMode = true,
             },
           },
           settings = {
             typescript = {
               inlayHints = {
-                enumMemberValues = { enabled = true },
-                functionLikeReturnTypes = { enabled = true },
+                enumMemberValues = { enabled = false },
+                functionLikeReturnTypes = { enabled = false },
+                -- enumMemberValues = { enabled = true },
+                -- functionLikeReturnTypes = { enabled = true },
                 propertyDeclarationTypes = { enabled = false },
                 variableTypes = { enabled = false },
                 parameterTypes = { enabled = false },
