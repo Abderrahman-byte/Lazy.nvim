@@ -1,130 +1,63 @@
+-- lua/plugins/vue_typescript.lua
 return {
+  -- ensure mason installs the servers
   {
     "williamboman/mason.nvim",
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
-      table.insert(opts.ensure_installed, "typescript-language-server")
-      table.insert(opts.ensure_installed, "vue-language-server")
+      -- needed for Vue SFC + Volar
+      vim.list_extend(opts.ensure_installed, { "vue-language-server", "typescript-language-server" })
     end,
   },
+
   {
     "neovim/nvim-lspconfig",
     opts = {
+      -- servers config
       servers = {
-        tsserver = {
-          enabled = false,
-        },
-        vtsls = {
-          enabled = false,
-        },
+        -- keep ts_ls present for pure TS/JS files, but don't let it own .vue
         ts_ls = {
-          init_options = {
-            plugins = {
-              {
-                name = "@vue/typescript-plugin",
-                -- Adjust the location as needed; here we assume it’s installed via Mason
-                location = vim.fn.stdpath("data")
-                  .. "/mason/packages/vue-language-server/node_modules/@vue/language-server",
-                languages = { "vue" },
-              },
-            },
-          },
+          enabled = true,
           filetypes = {
-            "javascript",
-            "javascript.jsx",
-            "javascriptreact",
             "typescript",
             "typescript.tsx",
             "typescriptreact",
-            "vue",
+            "javascript",
+            "javascriptreact",
+            "javascript.jsx",
+            -- DO NOT include "vue" here when using Volar takeover
           },
-          settings = {
-            typescript = {
-              tsserver = {
-                useSyntaxServer = false,
-              },
-              inlayHints = {
-                allowRenameOfImportPath = true,
-                includeCompletionsForImportStatements = true,
-                includeCompletionsForModuleExports = true,
-                includeCompletionsWithInsertText = true,
-                includeInlayParameterNameHints = "none", -- 'none' | 'literals' | 'all'
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = false,
-                includeInlayVariableTypeHints = false,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-                includeInlayPropertyDeclarationTypeHints = false,
-                -- includeInlayFunctionLikeReturnTypeHints = true,
-                -- includeInlayEnumMemberValueHints = true,
-                includeInlayFunctionLikeReturnTypeHints = false,
-                includeInlayEnumMemberValueHints = false,
-              },
-            },
-            javascript = {
-              inlayHints = {
-                includeInlayParameterNameHints = "none", -- 'none' | 'literals' | 'all'
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayVariableTypeHints = false,
-                includeInlayFunctionParameterTypeHints = false,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-                includeInlayPropertyDeclarationTypeHints = false,
-                -- includeInlayFunctionLikeReturnTypeHints = true,
-                -- includeInlayEnumMemberValueHints = true,
-                includeInlayFunctionLikeReturnTypeHints = false,
-                includeInlayEnumMemberValueHints = false,
-              },
-            },
-          },
+          -- If you want ts_ls to use workspace TS, you can add init_options.tsserver.path here
         },
+
+        -- Volar (vue-language-server). Name in lspconfig may be "volar" or "vue_ls" depending on your nvim-lspconfig.
         volar = {
           filetypes = { "vue", "typescript", "javascript" },
           init_options = {
             vue = {
-              -- Set to false for full takeover mode, so Volar provides type checking for both .vue and .ts parts
-              hybridMode = true,
+              -- takeover mode: Volar provides the TS type service for SFCs
+              hybridMode = false,
             },
           },
+          -- example Volar-specific settings, tweak inlay hints etc. as you like
           settings = {
             typescript = {
               inlayHints = {
-                enumMemberValues = { enabled = false },
-                functionLikeReturnTypes = { enabled = false },
-                -- enumMemberValues = { enabled = true },
-                -- functionLikeReturnTypes = { enabled = true },
-                propertyDeclarationTypes = { enabled = false },
-                variableTypes = { enabled = false },
+                parameterNames = { enabled = false },
                 parameterTypes = { enabled = false },
-                parameterNames = { enabled = "none" },
+                variableTypes = { enabled = false },
+                propertyDeclarationTypes = { enabled = false },
+                functionLikeReturnTypes = { enabled = false },
+                enumMemberValues = { enabled = false },
               },
             },
           },
         },
       },
+
+      -- optional: if you want to avoid both LSPs attaching simultaneously
       setup = {
-        -- OPTIONAL: Prevent both LSPs from attaching at once.
-        -- Uncomment the following autocmd if you want ts_ls to stop when Volar is active and vice versa.
-        --
-        -- function(server_name, opts)
-        --   vim.api.nvim_create_autocmd("LspAttach", {
-        --     group = vim.api.nvim_create_augroup("LspAttachConflicts", { clear = true }),
-        --     callback = function(args)
-        --       local client = vim.lsp.get_client_by_id(args.data.client_id)
-        --       if client and client.name == "volar" then
-        --         for _, other in ipairs(vim.lsp.get_active_clients()) do
-        --           if other.name == "ts_ls" then
-        --             other.stop()
-        --           end
-        --         end
-        --       elseif client and client.name == "ts_ls" then
-        --         for _, other in ipairs(vim.lsp.get_active_clients()) do
-        --           if other.name == "volar" then
-        --             client.stop()
-        --           end
-        --         end
-        --       end
-        --     end,
-        --   })
-        -- end,
+        -- if you need extra logic on attach/disable, put it here
       },
     },
   },
