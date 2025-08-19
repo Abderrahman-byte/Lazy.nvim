@@ -1,3 +1,24 @@
+local function find_vue_ts_plugin()
+  local workspace_path = vim.fn.getcwd() .. "/node_modules/@vue/typescript-plugin"
+
+  if vim.fn.isdirectory(workspace_path) == 1 then
+    return workspace_path
+  end
+
+  -- fallback to mason/vue-language-server nested plugin path
+  local mason_path = LazyVim.get_pkg_path(
+    "vue-language-server",
+    "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin"
+  )
+
+  if vim.fn.isdirectory(mason_path) == 1 then
+    return mason_path
+  end
+
+  -- last resort: point to the language-server dir (not ideal)
+  return LazyVim.get_pkg_path("vue-language-server", "/node_modules/@vue/language-server")
+end
+
 return {
   recommended = function()
     return LazyVim.extras.wants({
@@ -11,7 +32,7 @@ return {
     opts = { ensure_installed = { "vue", "css" } },
   },
 
-  -- Configure tsserver plugin
+  -- Configure vtsls (the TypeScript plugin host) with @vue/typescript-plugin
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
@@ -21,7 +42,7 @@ return {
       LazyVim.extend(opts.servers.vtsls, "settings.vtsls.tsserver.globalPlugins", {
         {
           name = "@vue/typescript-plugin",
-          location = LazyVim.get_pkg_path("vue-language-server", "/node_modules/@vue/language-server"),
+          location = find_vue_ts_plugin(),
           languages = { "vue" },
           configNamespace = "typescript",
           enableForWorkspaceTypeScriptVersions = true,
@@ -29,6 +50,8 @@ return {
       })
     end,
   },
+
+  -- Hook vue_ls to forward requests to vtsls
   {
     "neovim/nvim-lspconfig",
     opts = {
@@ -52,8 +75,10 @@ return {
                 command = "typescript.tsserverRequest",
                 arguments = { command, payload },
               }, { bufnr = context.bufnr }, function(_, resp)
-                -- send the tsserver/response back to Vue LSP
-                client.notify("tsserver/response", { { id, resp.body } })
+                if resp and resp.body then
+                  -- send the tsserver/response back to Vue LSP
+                  client.notify("tsserver/response", { { id, resp.body } })
+                end
               end)
             end
           end,
