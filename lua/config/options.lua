@@ -30,3 +30,5 @@ vim.g.autoformat = false
 vim.g.mapleader = " "
 
 vim.g.lazyvim_python_lsp = "pyright"
+
+vim.g.enable_vtsls = false
